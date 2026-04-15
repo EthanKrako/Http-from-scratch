@@ -1,3 +1,7 @@
+# Compiled files
+server
+main
+
 # Prerequisites
 *.d
 
