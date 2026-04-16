@@ -5,24 +5,42 @@
 #include <arpa/inet.h>
 
 #define PORT 8080
+#define WAITLINE_SIZE 5
+
+void handle_error(const char* msg) {
+    perror(msg);
+    exit(EXIT_FAILURE);
+}
 
 int main() {
-    int socketFD = socket(PF_INET, SOCK_STREAM, 0);
+    int socketfd = socket(PF_INET, SOCK_STREAM, 0);
 
-    if (socketFD == -1) {
-        perror("Socket creation failed");
-        exit(EXIT_FAILURE);
+    if (socketfd == -1) {
+        handle_error("Socket creation failed");
     }
 
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(PORT);
-    addr.sin_addr.s_addr = 0;
+    struct sockaddr_in socketAddr, clientAddr = { 0 };
+    socketAddr.sin_family = AF_INET;
+    socketAddr.sin_port = htons(PORT);
+    socketAddr.sin_addr.s_addr = 0;
 
-    if (bind(socketFD, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
-        perror("Could not bind to the port");
-        exit(EXIT_FAILURE);
+    if (bind(socketfd, (struct sockaddr*)&socketAddr, sizeof(socketAddr)) == -1) {
+        handle_error("Could not bind to the port");
     }
+
+    if (listen(socketfd, WAITLINE_SIZE) == -1) {
+        handle_error("Could not listen for connections");
+    }
+
+    socklen_t clientSize = sizeof(clientAddr);
+
+    int clientfd = accept(socketfd, (struct sockaddr*)&clientAddr, &clientSize);
+
+    if (clientfd == -1) {
+        handle_error("Could not accept connection from client");
+    }
+
+    printf("Client connected, fd=%d\n", clientfd);
 
     while(1) {}
 
