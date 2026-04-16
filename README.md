@@ -5,3 +5,4 @@ Implementing a simple HTTP server from scratch in C to understand the HTTP proto
 I'm trying to limit myself to only using the following articles and the man pages to build this server.
 
 - [Building Your Own Web Server Series' Articles](https://dev.to/dmytro_huz/series/33208)
+- [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/html/)
