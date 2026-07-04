@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include "http_parser.h"
 
 #define PORT 8080
 #define WAITLINE_SIZE 5
@@ -50,7 +51,9 @@ int main() {
     
     recv(clientfd, socketbuffer, BUFFER_SIZE, 0);
 
-    printf("Received message: %s\n", socketbuffer);
+    char* requestLine = strtok(socketbuffer, "\r\n");
+
+
 
     char* response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 13\r\n\r\nHello, World!";
     send(clientfd, response, strlen(response), 0);

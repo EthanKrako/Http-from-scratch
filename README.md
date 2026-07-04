@@ -6,3 +6,6 @@ I'm trying to limit myself to only using the following articles and the man page
 
 - [Building Your Own Web Server Series' Articles](https://dev.to/dmytro_huz/series/33208)
 - [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/html/)
+
+I'm also adding the Nginx source code as a reference for a real-world implementation and guidance for good coding practices.
+- [Nginx Source Code](https://github.com/nginx/nginx/tree/master)
