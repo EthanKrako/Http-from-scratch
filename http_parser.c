@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "http_parser.h"
+#include "utils.h"
 
 typedef enum {
     HTTP_OK = 0,
@@ -19,17 +20,34 @@ http_parse_error handle_header_request_line(char* line, http_message* msg) {
         return HTTP_ERROR_INVALID_ARGUMENT;
     }
 
-    char* method = strtok(line, "\r\n");
-    char* url = strtok(NULL, "\r\n");
-    char* version = strtok(NULL, "\r\n");
-
-    if (method == NULL || url == NULL || version == NULL) {
+    const char* method_end = strchr(line, ' ');
+    if (method_end == NULL) {
         return HTTP_ERROR_MALFORMED_START_LINE;
     }
 
-    msg->method = strdup(method);
-    msg->url = strdup(url);
-    msg->version = strdup(version);
+    const char* url_end = strchr(method_end + 1, ' ');
+    if (url_end == NULL) {
+        return HTTP_ERROR_MALFORMED_START_LINE;
+    }
+
+    const size_t method_length = method_end - line;
+    if (method_length == 0) {
+        return HTTP_ERROR_MALFORMED_START_LINE;
+    }
+
+    const size_t url_length = url_end - (method_end + 1);
+    if (url_length == 0) {
+        return HTTP_ERROR_MALFORMED_START_LINE;
+    }
+
+    const size_t version_length = strlen(url_end + 1);
+    if (version_length == 0) {
+        return HTTP_ERROR_MALFORMED_START_LINE;
+    }
+
+    msg->method = my_strndup(line, method_length);
+    msg->url = my_strndup(method_end + 1, url_length);
+    msg->version = my_strndup(url_end + 1, version_length);
 
     if (msg->method == NULL || msg->url == NULL || msg->version == NULL) {
         free(msg->method);
@@ -47,11 +65,11 @@ http_parse_error handle_header_request_line(char* line, http_message* msg) {
 http_parse_error parse_http_request(const char* request, http_message* msg) {
     http_parse_error return_value = HTTP_OK;
 
-    memset(msg, 0, sizeof(http_message));
-
     if (request == NULL || msg == NULL) {
         return HTTP_ERROR_INVALID_ARGUMENT;
     }
+
+    memset(msg, 0, sizeof(http_message));
 
     const char* header_end = strstr(request, HEADER_SEPARATOR);
 
