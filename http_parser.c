@@ -39,6 +39,23 @@ static http_parse_error add_header(http_message* msg, const char* name, size_t n
     return HTTP_OK;
 }
 
+static int header_name_equals_n(const char* name, size_t name_len, const char* literal) {
+    size_t i;
+    for (i = 0; i < name_len; i++) {
+        if (literal[i] == '\0') {
+            return 0;
+        }
+        char c1 = name[i];
+        char c2 = literal[i];
+        if (c1 >= 'A' && c1 <= 'Z') c1 = (char)(c1 + 32);
+        if (c2 >= 'A' && c2 <= 'Z') c2 = (char)(c2 + 32);
+        if (c1 != c2) {
+            return 0;
+        }
+    }
+    return literal[i] == '\0';
+}
+
 http_parse_error handle_header_request_line(char* line, http_message* msg) {
     if (line == NULL || msg == NULL) {
         return HTTP_ERROR_INVALID_ARGUMENT;
@@ -109,7 +126,10 @@ static http_parse_error handle_header_fields(http_message* msg) {
             return result;
         }
 
-        // search for content-length header to determine body length
+        if (header_name_equals_n(line, name_len, "Content-Length")) {
+            msg->body_length = strtoul(value, NULL, 10);
+        }
+
     }
 
     return HTTP_OK;
