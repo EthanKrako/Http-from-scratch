@@ -53,7 +53,17 @@ int main() {
 
     char* requestLine = strtok(socketbuffer, "\r\n");
 
+    http_message msg;
+    http_parse_error result = parse_http_request(requestLine, &msg);
 
+    if (result != HTTP_OK) {
+        handle_http_error(result);
+        close(clientfd);
+        close(socketfd);
+        return EXIT_FAILURE;
+    }
+
+    
 
     char* response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 13\r\n\r\nHello, World!";
     send(clientfd, response, strlen(response), 0);

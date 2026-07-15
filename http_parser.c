@@ -6,14 +6,30 @@
 
 const char* HEADER_SEPARATOR = "\r\n\r\n";
 
-typedef enum {
-    HTTP_OK = 0,
-    HTTP_ERROR_INVALID_ARGUMENT = -1,
-    HTTP_ERROR_MISSING_HEADER_TERMINATOR = -2,
-    HTTP_ERROR_EMPTY_HEADERS = -3,
-    HTTP_ERROR_MALFORMED_START_LINE = -4,
-    HTTP_ERROR_MEMORY_ALLOCATION = -5,
-} http_parse_error;
+void handle_http_error(http_parse_error error) {
+    switch (error) {
+        case HTTP_OK:
+            break;
+        case HTTP_ERROR_INVALID_ARGUMENT:
+            fprintf(stderr, "Error: Invalid argument provided.\n");
+            break;
+        case HTTP_ERROR_MISSING_HEADER_TERMINATOR:
+            fprintf(stderr, "Error: Missing header terminator.\n");
+            break;
+        case HTTP_ERROR_EMPTY_HEADERS:
+            fprintf(stderr, "Error: Empty headers in the request.\n");
+            break;
+        case HTTP_ERROR_MALFORMED_START_LINE:
+            fprintf(stderr, "Error: Malformed start line in the request.\n");
+            break;
+        case HTTP_ERROR_MEMORY_ALLOCATION:
+            fprintf(stderr, "Error: Memory allocation failed.\n");
+            break;
+        default:
+            fprintf(stderr, "Error: Unknown error occurred.\n");
+            break;
+    }
+}
 
 static http_parse_error add_header(http_message* msg, const char* name, size_t name_len, const char* value) {
     if (msg == NULL || name == NULL || value == NULL) {
