@@ -197,6 +197,18 @@ http_parse_error parse_http_request(const char* request, http_message* msg) {
         goto leave_header;
     }
 
+    const char* body_start = header_end + strlen(HEADER_SEPARATOR);
+
+    if (msg->body_length > 0) {
+        msg->body = malloc(msg->body_length + 1);
+        if (msg->body == NULL) {
+            return_value = HTTP_ERROR_MEMORY_ALLOCATION;
+            goto leave_header;
+        }
+        memcpy(msg->body, body_start, msg->body_length);
+        msg->body[msg->body_length] = '\0';
+    }
+
     leave_header:
     free(header);
 
