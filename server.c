@@ -51,10 +51,8 @@ int main() {
     
     recv(clientfd, socketbuffer, BUFFER_SIZE, 0);
 
-    char* requestLine = strtok(socketbuffer, "\r\n");
-
     http_message msg;
-    http_parse_error result = parse_http_request(requestLine, &msg);
+    http_parse_error result = parse_http_request(socketbuffer, &msg);
 
     if (result != HTTP_OK) {
         handle_http_error(result);
